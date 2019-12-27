@@ -65,8 +65,16 @@ def location_text(launch):
 
 def window_text(launch):
     clock = '🕒'
-    start = datetime.fromtimestamp(launch.get('wsstamp'))
-    end = datetime.fromtimestamp(launch.get('westamp'))
+
+    start_stamp = launch.get('wsstamp')
+    end_stamp = launch.get('westamp')
+
+    start = datetime.fromtimestamp(start_stamp)
+    end = datetime.fromtimestamp(end_stamp)
+    if start_stamp == 0:
+        start = "TBA"
+    if end_stamp == 0:
+        end = "TBA"
 
     return '{} {} - {}'.format(clock, start, end)
 
