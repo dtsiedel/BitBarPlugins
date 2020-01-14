@@ -11,9 +11,8 @@
 from requests import get
 from datetime import datetime
 
+date_format_string = '%B %d, %Y %H:%M:%S UTC'
 url = 'https://launchlibrary.net/1.4/launch/next/3'
-
-#TODO: parse isostart/isoend instead of using timestamp that isn't always there
 
 def separator():
     print('---')
@@ -65,20 +64,39 @@ def location_text(launch):
 
     return '{} {}'.format(flag_text, location.get('pads')[0].get('name'))
 
+def build_diff_string(diff):
+    res = ''
+
+    days, seconds = diff.days, diff.seconds
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+
+    if days > 0:
+        res += '{} days, '.format(days)
+
+    if hours > 0:
+        res += '{} hours, '.format(hours)
+
+    if minutes > 0:
+        res += '{} minutes, '.format(minutes)
+
+    # strip last comma if we had any entries
+    if len(res) > 1:
+        res = res[:-2]
+    else:
+        res = "Launch window open!"
+
+    return res
+
 def window_text(launch):
     clock = '🕒'
 
-    start_stamp = launch.get('wsstamp')
-    end_stamp = launch.get('westamp')
+    start = datetime.strptime(launch.get('windowstart'), date_format_string)
+    diff = start - datetime.utcnow()
 
-    start = datetime.fromtimestamp(start_stamp)
-    end = datetime.fromtimestamp(end_stamp)
-    if start_stamp == 0:
-        start = "TBA"
-    if end_stamp == 0:
-        end = "TBA"
+    diff_string = build_diff_string(diff)
 
-    return '{} {} - {}'.format(clock, start, end)
+    return '{} {} from now'.format(clock, diff_string)
 
 def print_data(json_data):
     launches = json_data['launches']
