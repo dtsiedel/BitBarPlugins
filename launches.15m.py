@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env PYTHONIOENCODING=UTF-8 /usr/local/bin/python3
 # -*- coding: utf-8 -*-
 
 # <bitbar.title>Upcoming Launches</bitbar.title>
@@ -12,6 +12,8 @@ from requests import get
 from datetime import datetime
 
 url = 'https://launchlibrary.net/1.4/launch/next/3'
+
+#TODO: parse isostart/isoend instead of using timestamp that isn't always there
 
 def separator():
     print('---')
