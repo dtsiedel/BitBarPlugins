@@ -14,29 +14,25 @@ from datetime import datetime
 date_format_string = '%B %d, %Y %H:%M:%S UTC'
 url = 'https://launchlibrary.net/1.4/launch/next/5'
 
+flags = {
+    'USA': '🇺🇸',
+    'ITA': '🇮🇹',
+    'CHN': '🇨🇳',
+    'RUS': '🇷🇺',
+    'JPN': '🇯🇵',
+    'IND': '🇮🇳',
+    'FRA': '🇫🇷',
+    'GUF': '🇬🇫'
+}
+
 def separator():
     print('---')
 
 def flag(country_code):
-    res = ''
-    if country_code == 'USA':
-        res += '🇺🇸'
-    elif country_code == 'ITA':
-        res += '🇮🇹'
-    elif country_code == 'CHN':
-        res += '🇨🇳'
-    elif country_code == 'RUS':
-        res += '🇷🇺'
-    elif country_code == 'JPN':
-        res += '🇯🇵'
-    elif country_code == 'IND':
-        res += '🇮🇳'
-    elif country_code == 'FRA':
-        res += '🇫🇷'
+    if country_code in flags:
+        return flags[country_code]
     else:
-        res += '❓'
-
-    return res
+        return '❓'
 
 def rocket():
     print('🚀')
