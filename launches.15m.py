@@ -12,7 +12,7 @@ from requests import get
 from datetime import datetime
 
 date_format_string = '%B %d, %Y %H:%M:%S UTC'
-url = 'https://launchlibrary.net/1.4/launch/next/3'
+url = 'https://launchlibrary.net/1.4/launch/next/5'
 
 def separator():
     print('---')
@@ -64,7 +64,7 @@ def location_text(launch):
 
     return '{} {}'.format(flag_text, location.get('pads')[0].get('name'))
 
-def build_diff_string(diff):
+def build_diff_string(diff, time_approx):
     res = ''
 
     days, seconds = diff.days, diff.seconds
@@ -74,19 +74,19 @@ def build_diff_string(diff):
     if days > 0:
         res += '{} days, '.format(days)
 
-    if hours > 0:
+    if not time_approx and hours > 0:
         res += '{} hours, '.format(hours)
 
-    if minutes > 0:
+    if not time_approx and minutes > 0:
         res += '{} minutes, '.format(minutes)
 
     # strip last comma if we had any entries
     if len(res) > 1:
         res = res[:-2]
     else:
-        res = "Launch window open!"
+        return "Launch window open!"
 
-    return res
+    return '{} from now'.format(res)
 
 def window_text(launch):
     clock = '🕒'
@@ -94,9 +94,10 @@ def window_text(launch):
     start = datetime.strptime(launch.get('windowstart'), date_format_string)
     diff = start - datetime.utcnow()
 
-    diff_string = build_diff_string(diff)
+    time_approx = start.hour == 0 and start.minute == 0
+    diff_string = build_diff_string(diff, time_approx)
 
-    return '{} {} from now'.format(clock, diff_string)
+    return '{} {}'.format(clock, diff_string)
 
 def print_data(json_data):
     launches = json_data['launches']
