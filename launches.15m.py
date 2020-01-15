@@ -31,6 +31,8 @@ def flag(country_code):
         res += '🇯🇵'
     elif country_code == 'IND':
         res += '🇮🇳'
+    elif country_code == 'FRA':
+        res += '🇫🇷'
     else:
         res += '❓'
 
