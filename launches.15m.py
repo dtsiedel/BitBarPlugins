@@ -70,13 +70,16 @@ def build_diff_string(diff, time_approx):
     minutes = (seconds % 3600) // 60
 
     if days > 0:
-        res += '{} days, '.format(days)
+        singular = days == 1
+        res += '{} day{}, '.format(days, '' if singular else 's')
 
     if not time_approx and hours > 0:
-        res += '{} hours, '.format(hours)
+        singular = hours == 1
+        res += '{} hour{}, '.format(hours, '' if singular else 's')
 
     if not time_approx and minutes > 0:
-        res += '{} minutes, '.format(minutes)
+        singular = minutes == 1
+        res += '{} minute{}, '.format(minutes, '' if singular else 's')
 
     # strip last comma if we had any entries
     if len(res) > 1:
