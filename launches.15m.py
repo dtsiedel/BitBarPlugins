@@ -9,9 +9,9 @@
 # <bitbar.dependencies>python</bitbar.dependencies>
 
 from requests import get
-from datetime import datetime
+from datetime import datetime, timezone
 
-date_format_string = '%Y-%m-%dT%H:%M:%SZ'
+date_format_string = '%Y-%m-%dT%H:%M:%S%z'
 url = 'https://ll.thespacedevs.com/2.0.0/launch/upcoming/?ordering=window_start&limit=5'
 
 flags = {
@@ -39,8 +39,23 @@ def flag(country_code):
 def rocket():
     print('🚀')
 
-def title():
-    rocket()
+def title(json_data):
+    # TODO: Super-redundant processing with the other date code. But I wrote it
+    #       to print as it goes so it would be a pain to fix it now.
+    launch_soon = False
+    now = datetime.now(tz=timezone.utc)
+    for launch in json_data['results']:
+        start = datetime.strptime(launch.get('window_start'), date_format_string)
+        diff = start - now
+        days, seconds = diff.days, diff.seconds
+        hours = seconds // 3600
+        if days == 0 and hours < 5:
+            launch_soon = True
+
+    if launch_soon:
+        rocket()
+    else:
+        print('🕒')
 
 def gather_data(a_url):
     return get(url).json()
@@ -92,7 +107,7 @@ def window_text(launch):
     clock = '🕒'
 
     start = datetime.strptime(launch.get('window_start'), date_format_string)
-    diff = start - datetime.utcnow()
+    diff = start - datetime.now(timezone.utc)
 
     time_approx = start.hour == 0 and start.minute == 0
     diff_string = build_diff_string(diff, time_approx)
@@ -101,7 +116,7 @@ def window_text(launch):
 
 def print_data(json_data):
     launches = json_data['results']
-    title()
+    title(json_data)
     for l in launches:
         separator()
         text = launch_text(l)
