@@ -11,8 +11,8 @@
 from requests import get
 from datetime import datetime
 
-date_format_string = '%B %d, %Y %H:%M:%S UTC'
-url = 'https://launchlibrary.net/1.4/launch/next/5'
+date_format_string = '%Y-%m-%dT%H:%M:%SZ'
+url = 'https://ll.thespacedevs.com/2.0.0/launch/upcoming/?ordering=window_start&limit=5'
 
 flags = {
     'USA': '🇺🇸',
@@ -23,7 +23,8 @@ flags = {
     'IND': '🇮🇳',
     'FRA': '🇫🇷',
     'GUF': '🇬🇫',
-    'NZL': '🇳🇿'
+    'NZL': '🇳🇿',
+    'UNK': '🇽🇰'
 }
 
 def separator():
@@ -48,20 +49,17 @@ def launch_text(launch):
     video = '(🎥)'
     if len(get_link(launch)) <= 0:
         video = ''
-    flag_text = flag(launch.get('lsp').get('countryCode'))
+    flag_text = flag(launch.get('pad').get('location').get('country_code'))
     return '{} {} {}'.format(flag_text, launch['name'].replace('|', '-'), video)
 
 def get_link(launch):
     key = 'vidURLs'
-    if len(launch['vidURLs']) > 0:
-        return 'href={}'.format(launch['vidURLs'][0])
+    if key in launch and len(launch[key]) > 0:
+        return 'href={}'.format(launch[key][0])
     return ''
 
 def location_text(launch):
-    location = launch.get('location')
-    flag_text = flag(location.get('countryCode'))
-
-    return '{} {}'.format(flag_text, location.get('pads')[0].get('name'))
+    return launch.get('pad').get('location').get('name')
 
 def build_diff_string(diff, time_approx):
     res = ''
@@ -93,7 +91,7 @@ def build_diff_string(diff, time_approx):
 def window_text(launch):
     clock = '🕒'
 
-    start = datetime.strptime(launch.get('windowstart'), date_format_string)
+    start = datetime.strptime(launch.get('window_start'), date_format_string)
     diff = start - datetime.utcnow()
 
     time_approx = start.hour == 0 and start.minute == 0
@@ -102,7 +100,7 @@ def window_text(launch):
     return '{} {}'.format(clock, diff_string)
 
 def print_data(json_data):
-    launches = json_data['launches']
+    launches = json_data['results']
     title()
     for l in launches:
         separator()
